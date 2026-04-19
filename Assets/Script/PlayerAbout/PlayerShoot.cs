@@ -31,7 +31,7 @@ public class PlayerShoot : MonoBehaviour
 
             timer = GameData.Instance.shootInterval * GameData.Instance.shootScale;
         }
-        //以下为鼠标电机操控
+        //以下为鼠标点击操控
         //if(Input.GetMouseButton(0) && timer <= 0)
         //{
         //    //屏幕坐标转世界坐标 用于计算子弹飞行方向

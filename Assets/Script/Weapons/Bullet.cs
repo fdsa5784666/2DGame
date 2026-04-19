@@ -6,6 +6,15 @@ using UnityEngine.EventSystems;
 
 public class Bullet : MonoBehaviour, IPooledable
 {
+    [Header("组件")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private TrailRenderer trailRenderer;
+
+    private BulletInfo info;
+    private int remainingPierce;
+    private HashSet<GameObject> hitEnemies = new HashSet<GameObject>();
+    private Transform homingTarget;
+
     //子弹及时不离开场景或者产生碰撞 十秒也自然消亡
     //否则同时活跃对象容易过多
     private float offscreenPadding = 10f;
