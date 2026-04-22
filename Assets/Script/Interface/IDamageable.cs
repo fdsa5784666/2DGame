@@ -4,5 +4,15 @@ using UnityEngine;
 
 public interface IDamageable
 {
-    void TakeDamage(float damage);
+    void TakeDamage(float damage, bool isCritical = false);
+    Transform GetTransform();
+    bool IsAlive();
+    ETeam GetTeam();
+}
+
+public enum ETeam
+{
+    Player,
+    Enemy,
+    Neutral
 }

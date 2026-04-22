@@ -12,7 +12,7 @@ public class LevelUPOption
     public int maxLevel = 10;//此选项最多被选择次数
     //public bool requierFullHealth = false;
 
-    [HideInInspector]
+    //[HideInInspector]
     //此选项当前选过多少次
     public int currentLevel = 0;
     public enum LevelUPType
@@ -28,6 +28,7 @@ public class LevelUPOption
 
     public void Apply(GameObject GameData)
     {
+        Debug.Log("Applying " + optionName);
         GameData gameData = GameData.GetComponent<GameData>();
         switch (type)
         {
@@ -38,8 +39,8 @@ public class LevelUPOption
                 gameData.bulletSpeed += value;
                 break;
             case LevelUPType.shootIntervalUp:
-                gameData.shootInterval += value;
-                gameData.shootInterval = Mathf.Clamp(gameData.shootInterval, 0.2f, 1f);
+                gameData.shootInterval/= value;
+                gameData.shootInterval = Mathf.Clamp(gameData.shootInterval, 0.1f, 1f);
                 break;
             case LevelUPType.AttackUp:
                 gameData.bulletDamage += value; 

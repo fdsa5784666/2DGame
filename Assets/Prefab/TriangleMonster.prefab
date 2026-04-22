@@ -141,6 +141,9 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   id: Enemy
+  team: 1
+  hitFlashDuration: 0.1
+  hitFlashColor: {r: 0.93333334, g: 0.30588236, b: 0.30588236, a: 1}
   deathEffectPrefab: {fileID: 1549548586571861915, guid: 84ce56e2d14b9c04f9d605c43bc02d6a, type: 3}
 --- !u!60 &2042022787085589526
 PolygonCollider2D:

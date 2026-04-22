@@ -31,13 +31,23 @@ public partial class GameData : MonoBehaviour
     public bool bulletPenetrable = false;
 
     [Header("怪物通用")]
-    public int enemyCollideDamage = 10;
-    public float enemyMaxHp = 10f;
-    public float repelMultValue = 1.5f;
-    public int maxActiveEnemy = 180;
-    public float spawnInterval = 3f;
-    public float triangleMoveSpeed = 2f;
-    public int triangleMonsterEXP = 1;
+    [SerializeField] private int enemyCollideDamage = 10;
+    [SerializeField] private float enemyMaxHp = 10f;
+    [SerializeField] private float repelMultValue = 1.5f;
+    [SerializeField] private int maxActiveEnemy = 180;
+    [SerializeField] private float spawnInterval = 3f;
+    [SerializeField] private float triangleMoveSpeed = 2f;
+    [SerializeField] private int triangleMonsterEXP = 1;
+    [SerializeField] private int triangleMonsterGold = 1;
+
+    public int EnemyCollideDamage => enemyCollideDamage;
+    public float EnemyMaxHp => enemyMaxHp;
+    public float RepelMultValue => repelMultValue;
+    public int MaxActiveEnemy => maxActiveEnemy;
+    public float SpawnInterval => spawnInterval;
+    public float TriangleMoveSpeed => triangleMoveSpeed;
+    public int TriangleMonsterEXP => triangleMonsterEXP;
+    public int TriangleMonsterGold => triangleMonsterGold;
 
     [Header("游戏逻辑参数")]
     public float HealthPotionRandomValue = 0.05f;

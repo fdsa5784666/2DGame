@@ -11,7 +11,6 @@ public class SettingButton : MonoBehaviour
     {
         if (setting != null)
         {
-            Debug.Log("setting不为空");
             setting.SetActive(false);
         }
         closeButton.onClick.AddListener(OnButtonClick);

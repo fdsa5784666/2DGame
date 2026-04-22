@@ -1,15 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Sprites;
 using UnityEngine;
 
 public class LevelUPManager : MonoBehaviour
 {
-    public List<LevelUPOption> allPossibleLevelUP;
+    //public List<BulletUpgradeData> allPossibleUpgrades;
+    public List<LevelUPOption> allPossibleLevelUP;             //原本加成 需要手动添加
     public GameObject levelUPPanelPrefab;
     public Canvas mainCanvas;
     private GameObject currentPanel;
-
 
     [Header("随机规则")]
     [SerializeField]
@@ -28,41 +29,28 @@ public class LevelUPManager : MonoBehaviour
     /// <summary>
     /// 根据权重抽取count个可选升级选项
     /// </summary>
-    /// <param name="count"></param>
-    /// <returns></returns>
+    /// <param name = "count" ></ param >
+    /// < returns ></ returns >
     public List<LevelUPOption> GetRandomUpgrades(int count)
     {
-        //List<LevelUPOption> shuffled = new List<LevelUPOption>(allPossibleLevelUP);
-
-        //for (int i = 0; i < shuffled.Count; i++)
-        //{
-        //    int rand = Random.Range(i, shuffled.Count);
-        //    LevelUPOption temp = shuffled[i];
-        //    shuffled[i] = shuffled[rand];
-        //    shuffled[rand] = temp;  
-
-
-        //}
-        ////打乱后 取前三个
-        ////如果不足三个就取最多
-        //return shuffled.GetRange(0, Mathf.Min(count, shuffled.Count));
-
         //获取可用项
         int playerLevel = GetPlayerLevel();
         List<LevelUPOption> availableOption = allPossibleLevelUP.
-            Where(opt => opt != null && opt.CanBeSelected(playerLevel)).ToList();
+        Where(opt => opt != null && opt.CanBeSelected(playerLevel)).ToList();
         //没有就结束
         if (availableOption.Count == 0)
         {
             Debug.Log("没有可用升级选项");
             return new List<LevelUPOption>();
         }
+
         //数量正好或者不足就打乱全部取出
-        if(availableOption.Count <= count)
+        if (availableOption.Count <= count)
         {
             return ShuffleList(availableOption);
         }
-        //正常情况 : 按权重抽取
+
+        //正常情况: 按权重抽取
         List<LevelUPOption> selected = new List<LevelUPOption>();
         List<LevelUPOption> pool = new List<LevelUPOption>(availableOption);
 
@@ -126,9 +114,17 @@ public class LevelUPManager : MonoBehaviour
 
     public void OnOptionSelected(LevelUPOption chosen)
     {
+        //GameData.Instance.AddAttackPercent(chosen.attackPercentBonus);
+        //GameData.Instance.AddBulletSpeed(chosen.bulletSpeedBonus);
+        //GameData.Instance.AddBulletSize(chosen.bulletSizeBonus);
+        //GameData.Instance.AddPierce(chosen.pierceBonus);
+        //GameData.Instance.AddProjectileCount(chosen.projectileCountBonus);
+        //GameData.Instance.AddSplitCount(chosen.splitBonus);
+        //GameData.Instance.AddExplosionRadius(chosen.explosionRadiusBonus);
         chosen.Apply(GameData.Instance.gameObject);
         GameData.Instance.Pause();
         GameData.Instance.FullHP();
+
         //此处为选择升级效果的最后 在此加入特效
 
 

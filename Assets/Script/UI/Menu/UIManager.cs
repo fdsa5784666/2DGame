@@ -127,5 +127,21 @@ public class UIManager : MonoBehaviour
             GameData.Instance.Pause();
         }
     }
+
+    /// <summary>
+    /// 此函数应展示游戏结束UI 少量不同表示场次结束情况
+    /// </summary>
+    /// <param name="virtory"></param>
+    public void ShowGameOver(bool victory)
+    {
+        if (victory)
+        {
+            Debug.Log("玩家胜利,游戏结束");
+        }
+        else
+        {
+            Debug.Log("玩家失败,游戏结束");
+        }
+    }
 }
 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Upgrade_Attack", menuName = "Game/Upgrades/Attack Upgrade")]
+[CreateAssetMenu(fileName = "Upgrade_Attack", menuName = "Game/Attack Upgrade")]
 public class BulletUpgradeData : ScriptableObject
 {
     [Header("=== 显示信息 ===")]

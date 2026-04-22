@@ -14,7 +14,7 @@ public class EXP : Item,IPickable_EXP
 
     public override void ReturnToPool()
     {
-        ObjectPool.instance.ReturnToPool("EXP", gameObject);
+        ObjectPool.Instance.ReturnToPool("EXP", gameObject);
     }
 
     public int PickEXP()

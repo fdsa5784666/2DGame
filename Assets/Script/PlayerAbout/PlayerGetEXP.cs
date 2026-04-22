@@ -42,15 +42,15 @@ public class PlayerGetEXP : MonoBehaviour
     public void PlayerLevelUP()
     {
         GameData.Instance.playerLevel++;
-        
+
 
         Debug.Log($"玩家升级了,现在{GameData.Instance.playerLevel}");
         //此处为升级选项UI的开始 可在此处加入特效
         LevelUPManager.ShowRandowUpgrades();
 
-        
-        GameData.Instance.expToNextLevel = (int)(Mathf.Round(GameData.Instance.expToNextLevel*
-            GameData.LevelUpValueMultValue));
+
+        GameData.Instance.expToNextLevel = (int)(Mathf.Round(GameData.Instance.expToNextLevel *
+                                                 GameData.LevelUpValueMultValue));
         lastTargetLevelFloat = targetLevelFloat;
         targetLevelFloat += GameData.Instance.expToNextLevel;
 

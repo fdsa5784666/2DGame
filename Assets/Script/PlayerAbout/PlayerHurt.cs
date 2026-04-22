@@ -1,12 +1,10 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
-public class PlayerHurt : MonoBehaviour,IDamageable
+public class PlayerHurt : MonoBehaviour, IDamageable
 {
     private Transform playerTransform;
     private Vector3 playerRepeledPos;
@@ -39,42 +37,28 @@ public class PlayerHurt : MonoBehaviour,IDamageable
 
         playerTransform = transform;
 
-        if ( HealthBar != null)
+        if (HealthBar != null)
         {
             HealthView = HealthBar.transform.Find("HealthBar_Background/HealthView");
             Text = HealthBar.transform.Find("HealthBar_Background/Text");
-            if( HealthView != null && Text != null )
+            if (HealthView != null && Text != null)
             {
                 HealthView_UI = HealthView.GetComponent<Image>();
                 Text_UI = Text.GetComponent<TextMeshProUGUI>();
             }
         }
     }
-
-    public void TakeDamage(float damage)
-    {
-        GameData.Instance.playerCurrentHealth -= damage;
-        //开始协程 执行闪屏特效
-        if(damageFlashImage != null )
-        {
-            if (flashCoroutine != null)
-            {
-                StopCoroutine(flashCoroutine);
-            }
-            flashCoroutine = StartCoroutine(FlashCoroutine());
-        }
-    }
     private void OnCollisionStay2D(Collision2D collision)
     {
         //以下为受伤具体效果
-        if ( collision.gameObject.CompareTag("Enemy") && timer <= 0 )
+        if (collision.gameObject.CompareTag("Enemy") && timer <= 0)
         {
-            
-            TakeDamage(GameData.Instance.enemyCollideDamage);
+
+            TakeDamage(GameData.Instance.EnemyCollideDamage);
 
             Vector3 PlayerPos = playerTransform.position;
-            repelDrection = ( PlayerPos - collision.transform.position ).normalized;
-            playerTransform.position += repelDrection * GameData.Instance.repelMultValue;
+            repelDrection = (PlayerPos - collision.transform.position).normalized;
+            playerTransform.position += repelDrection * GameData.Instance.RepelMultValue;
 
             timer = hurtInterval;
         }
@@ -111,16 +95,45 @@ public class PlayerHurt : MonoBehaviour,IDamageable
             float alpha = Mathf.Lerp(flashAlpha, 0f, timer / fadeOutTime);
             SetFlashAlpha(alpha);
             yield return null;
-        
+
         }
         //确保归零
-        SetFlashAlpha (0f);
+        SetFlashAlpha(0f);
     }
 
     void SetFlashAlpha(float alpha)
     {
         Color color = damageFlashImage.color;
-        color.a = alpha;    
+        color.a = alpha;
         damageFlashImage.color = color;
+    }
+
+    public void TakeDamage(float damage, bool isCritical = false)
+    {
+        GameData.Instance.playerCurrentHealth -= damage;
+        //开始协程 执行闪屏特效
+        if (damageFlashImage != null)
+        {
+            if (flashCoroutine != null)
+            {
+                StopCoroutine(flashCoroutine);
+            }
+            flashCoroutine = StartCoroutine(FlashCoroutine());
+        }
+    }
+
+    public Transform GetTransform()
+    {
+        return transform;
+    }
+
+    public ETeam GetTeam()
+    {
+        return ETeam.Player;
+    }
+
+    public bool IsAlive()
+    {
+        throw new NotImplementedException();
     }
 }
