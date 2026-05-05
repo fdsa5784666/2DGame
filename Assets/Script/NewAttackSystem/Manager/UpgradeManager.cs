@@ -41,17 +41,17 @@ public class UpgradeManager : MonoBehaviour
     void Start()
     {
         // 订阅游戏时间事件，用于触发强制置换
-        if (GameManager.Instance != null)
+        if (GameData.Instance != null)
         {
-            GameManager.Instance.OnTimerUpdated += CheckGuaranteedReplace;
+            GameData.Instance.OnTimerUpdated += CheckGuaranteedReplace;
         }
     }
 
     void OnDestroy()
     {
-        if (GameManager.Instance != null)
+        if (GameData.Instance != null)
         {
-            GameManager.Instance.OnTimerUpdated -= CheckGuaranteedReplace;
+            GameData.Instance.OnTimerUpdated -= CheckGuaranteedReplace;
         }
     }
 
@@ -69,7 +69,7 @@ public class UpgradeManager : MonoBehaviour
         if (selected.Count == 0)
         {
             // 没有可用升级，直接恢复游戏
-            GameManager.Instance.Resume();
+            GameData.Instance.Resume();
             return;
         }
 
@@ -94,14 +94,14 @@ public class UpgradeManager : MonoBehaviour
     private List<UpgradeData> GetAvailableUpgrades()
     {
         var available = new List<UpgradeData>();
-        int playerLevel = GameManager.Instance?.CurrentLevel ?? 1;
+        int playerLevel = GameData.Instance?.playerLevel ?? 1;
         var slotManager = WeaponSlotManager.Instance;
-        var gameManager = GameManager.Instance;
+        var gameData = GameData.Instance;
 
         // 添加普通升级
         foreach (var upgrade in allUpgrades)
         {
-            if (upgrade.CanAppear(playerLevel, slotManager, gameManager))
+            if (upgrade.CanAppear(playerLevel, slotManager, gameData))
             {
                 available.Add(upgrade);
             }
@@ -110,7 +110,7 @@ public class UpgradeManager : MonoBehaviour
         // 添加碎片升级（动态生成）
         foreach (var fragment in fragmentUpgrades)
         {
-            if (fragment.CanAppear(playerLevel, slotManager, gameManager))
+            if (fragment.CanAppear(playerLevel, slotManager, gameData))
             {
                 available.Add(fragment);
             }
@@ -176,29 +176,29 @@ public class UpgradeManager : MonoBehaviour
     {
         float weight = upgrade.GetBaseWeight();
 
-        // 如果是碎片，检查是否差一点激活羁绊
+        //如果是碎片，检查是否差一点激活羁绊
         if (upgrade is SynergyFragmentData fragment)
         {
             var synergy = FindSynergyForTag(fragment.fragmentTag);
             if (synergy != null)
             {
-                int missing = slotManager.GetMissingForNextTier(synergy);
-                if (missing == 1)
-                {
-                    weight *= 3f; // 差1个，大幅提高概率
-                }
-                else if (missing == 2)
-                {
-                    weight *= 1.5f;
-                }
+                //int missing = slotManager.GetMissingForNextTier(synergy);
+                //if (missing == 1)
+                //{
+                //    weight *= 3f; // 差1个，大幅提高概率
+                //}
+                //else if (missing == 2)
+                //{
+                //    weight *= 1.5f;
+                //}
             }
         }
 
-        // 如果是指定武器升级，且该武器等级较低
+        //如果是指定武器升级，且该武器等级较低
         if (!string.IsNullOrEmpty(upgrade.requiredWeaponName))
         {
             var weapon = slotManager.GetWeaponByName(upgrade.requiredWeaponName);
-            if (weapon != null && weapon.Level <= 2)
+            if (weapon != null && weapon.StarLevel <= 2)
             {
                 weight *= 1.5f; // 低等级武器升级优先
             }
@@ -242,7 +242,7 @@ public class UpgradeManager : MonoBehaviour
 
         if (chosen != null)
         {
-            chosen.Apply(WeaponSlotManager.Instance, GameManager.Instance);
+            chosen.Apply(WeaponSlotManager.Instance, GameData.Instance);
             OnUpgradeSelected?.Invoke(chosen);
         }
 
@@ -252,8 +252,8 @@ public class UpgradeManager : MonoBehaviour
             currentPanel = null;
         }
 
-        GameManager.Instance.Resume();
-        GameManager.Instance.FullHeal(); // 升级回满血
+        GameData.Instance.Resume();
+        GameData.Instance.FullHP(); // 升级回满血
     }
     #endregion
 
@@ -272,10 +272,10 @@ public class UpgradeManager : MonoBehaviour
     public void ShowReplacePanel()
     {
         if (replaceUsed) return;
-        if (GameManager.Instance.CurrentState != GameState.Playing) return;
+        if (GameData.Instance.CurrentState != EGameState.Playing) return;
 
         replaceUsed = true;
-        GameManager.Instance.Pause();
+        GameData.Instance.Pause();
 
         OnReplaceShown?.Invoke();
 
@@ -292,8 +292,9 @@ public class UpgradeManager : MonoBehaviour
 
     private void OnReplaceConfirmed(WeaponInstance oldWeapon, WeaponData newWeapon)
     {
-        WeaponSlotManager.Instance.ReplaceWeapon(oldWeapon, newWeapon);
-        CloseReplacePanel();
+        //int index= WeaponSlotManager.Instance.GetWeaponIndex(oldWeapon);
+        //WeaponSlotManager.Instance.ReplaceWeapon(index, newWeapon);
+        //CloseReplacePanel();
     }
 
     private void OnReplaceCancelled()
@@ -308,7 +309,7 @@ public class UpgradeManager : MonoBehaviour
             Destroy(currentPanel);
             currentPanel = null;
         }
-        GameManager.Instance.Resume();
+        GameData.Instance.Resume();
     }
     #endregion
 
@@ -337,7 +338,7 @@ public class SynergyFragmentData : UpgradeData
     [Header("=== 碎片专属 ===")]
     public EWeaponTag fragmentTag = EWeaponTag.Fire;
 
-    public override bool CanAppear(int playerLevel, WeaponSlotManager slotManager, GameManager gameManager)
+    public override bool CanAppear(int playerLevel, WeaponSlotManager slotManager, GameData gameManager)
     {
         // 碎片总是可以出现（只要有这个标签的羁绊）
         return true; // 简化

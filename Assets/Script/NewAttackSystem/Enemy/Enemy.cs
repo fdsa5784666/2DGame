@@ -59,14 +59,14 @@ public abstract class Enemy : MonoBehaviour,IDamageable,IDropItem
     protected virtual void Update()
     {
         if (!isAlive) return;
-        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.Playing) return;
+        if (GameData.Instance != null && GameData.Instance.CurrentState != EGameState.Playing) return;
         EnemyMove();
     }
     protected virtual void EnemyMove()
     {
         
     }
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
         ActiveEnemies.Add(this);
     }
@@ -83,13 +83,15 @@ public abstract class Enemy : MonoBehaviour,IDamageable,IDropItem
     public virtual void TakeDamage(float damage, bool isCritical = false)
     {
         if (!isAlive) return;
-
+        float fDamage = damage * GameData.Instance.FinalCriticalDamage;
         if (isCritical)
         {
-            currentHealth -= damage * GameData.Instance.FinalCriticalDamage;
+            currentHealth -= fDamage;
+            Debug.Log($"{id}受到暴击伤害: {fDamage}, 当前血量: {currentHealth}/{maxHealth * healthMultiplier}");
         }
         else
         {
+            Debug.Log($"常规{damage}伤害");
             currentHealth -= damage;
         }
         

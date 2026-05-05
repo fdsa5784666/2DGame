@@ -12,7 +12,10 @@ public class EnemySpawner : MonoBehaviour
         public float startTime;               // 波次开始时间
         public float endTime;                 // 波次结束时间
         public string enemyTag;               // 生成敌人类型标签(同对象池名)
-        public float spawnRate = 1f;          // 每秒生成数量
+        public float baseSpawnRate = 1f;          // 基础的每秒生成数量
+        [HideInInspector]
+        public float spawnRate = 1f;              // 实际生成速率（受曲线影响）
+        public AnimationCurve spawnRateCurve; // 生成速率随时间变化的曲线
         public int maxActiveCount = 50;       // 同时存在最多数
         public float healthMultiplier = 1f;
         public float damageMultiplier = 1f;
@@ -22,11 +25,11 @@ public class EnemySpawner : MonoBehaviour
     [Header("=== 波次配置 ===")]
     [SerializeField] private List<WaveConfig> waves = new List<WaveConfig>();
 
-    //[Header("=== Boss配置 ===")]
-    //[SerializeField] private GameObject bossPrefab;
-    //[SerializeField] private float bossSpawnTime = 1140f; // 19分钟
-    //[SerializeField] private Transform bossSpawnPoint;
-    //[SerializeField] private float bossHealthMultiplier = 5f;
+    [Header("=== Boss配置 ===")]
+    [SerializeField] private GameObject bossPrefab;
+    [SerializeField] private float bossSpawnTime = 1140f; // 19分钟
+    [SerializeField] private Transform bossSpawnPoint;
+    [SerializeField] private float bossHealthMultiplier = 5f;
 
     [Header("=== 生成参数 ===")]
     [SerializeField] private Vector2 spawnAreaSize = new Vector2(20, 15);
@@ -36,9 +39,10 @@ public class EnemySpawner : MonoBehaviour
     [Header("=== 引用 ===")]
     [SerializeField] private Transform playerTransform;
     [SerializeField] private ObjectPool _pool;
+    [SerializeField] private Camera mainCamera;
 
     // 运行时状态
-    private float gameTimer = 0f;
+    [SerializeField]private float gameTimer = 0f;
     private bool isEndlessMode = false;
     private bool bossSpawned = false;
     private float endlessDifficultyMultiplier = 1f;
@@ -61,6 +65,11 @@ public class EnemySpawner : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+        waveSpawnTimers = new Dictionary<WaveConfig, float>();
+        foreach (var wave in waves)
+        {
+            waveSpawnTimers[wave] = 0f;
+        }
     }
 
     void Start()
@@ -68,16 +77,14 @@ public class EnemySpawner : MonoBehaviour
         if (playerTransform == null)
             playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-        waveSpawnTimers = new Dictionary<WaveConfig, float>();
-        foreach( var wave in waves)
-        {
-            waveSpawnTimers[wave] = 0f;
-        }
+        
+        if(mainCamera == null)
+            mainCamera = Camera.main;   
     }
 
     void Update()
     {
-        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.Playing)
+        if (GameData.Instance != null && GameData.Instance.CurrentState != EGameState.Playing)
             return;
 
         // 按时间生成敌人
@@ -90,21 +97,25 @@ public class EnemySpawner : MonoBehaviour
                 waveSpawnTimers[wave] = 0f;
 
             waveSpawnTimers[wave] -= Time.deltaTime;
-
+            wave.spawnRate = wave.baseSpawnRate * 
+                wave.spawnRateCurve.Evaluate((gameTimer - wave.startTime) / (wave.endTime - wave.startTime));
             if (waveSpawnTimers[wave] <= 0 && activeEnemies.Count < wave.maxActiveCount)
             {
+                Debug.Log("当前可生成敌人，尝试生成...");
                 SpawnEnemy(wave);
                 waveSpawnTimers[wave] = 1f / wave.spawnRate;
             }
         }
 
-        gameTimer += Time.deltaTime;    
+        gameTimer += Time.deltaTime;
 
-        //// Boss生成检查
-        //if (!bossSpawned && gameTimer >= bossSpawnTime)
-        //{
-        //    SpawnBoss();
-        //}
+        // Boss生成检查
+        if (!bossSpawned && gameTimer >= bossSpawnTime)
+        {
+            OnBossSpawned?.Invoke();
+            //SpawnBoss();
+        }
+        
     }
 
     #region 生成逻辑
@@ -112,36 +123,66 @@ public class EnemySpawner : MonoBehaviour
     private void SpawnEnemy(WaveConfig wave)
     {
         // 设置位置
-        Vector2 spawnPos = GetValidSpawnPosition();
+        Vector2 spawnPos = GetValidSpawnPosition(2f);
 
         GameObject enemy = _pool.SpawnFromPool(wave.enemyTag, spawnPos);
         activeEnemies.Add(enemy);
         OnEnemySpawned?.Invoke(enemy);
     }
 
-    private Vector2 GetValidSpawnPosition()
+    private Vector2 GetValidSpawnPosition(float extraDistance = 1f)
     {
-        if (playerTransform == null)
-            return GetRandomPositionInArea();
+        //if (playerTransform == null)
+        //    return GetRandomPositionInArea();
 
-        for (int i = 0; i < 30; i++)
+        //for (int i = 0; i < 30; i++)
+        //{
+        //    float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+        //    Vector2 offset = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * spawnDistanceFromPlayer;
+        //    Vector2 spawnPos = (Vector2)playerTransform.position + offset;
+
+        //    // 确保在生成区域内
+        //    spawnPos.x = Mathf.Clamp(spawnPos.x, -spawnAreaSize.x / 2, spawnAreaSize.x / 2);
+        //    spawnPos.y = Mathf.Clamp(spawnPos.y, -spawnAreaSize.y / 2, spawnAreaSize.y / 2);
+
+        //    // 检查是否有障碍物
+        //    if (!Physics2D.OverlapCircle(spawnPos, 1f, obstacleLayer))
+        //    {
+        //        return spawnPos;
+        //    }
+        //}
+
+        //return GetRandomPositionInArea();
+        // 获取屏幕边界的世界坐标
+        Vector2 min = mainCamera.ViewportToWorldPoint(new Vector3(0, 0, 0));
+        Vector2 max = mainCamera.ViewportToWorldPoint(new Vector3(1, 1, 0));
+
+        // 随机选择一条边
+        int edge = Random.Range(0, 4);
+
+        float x = 0, y = 0;
+
+        switch (edge)
         {
-            float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
-            Vector2 offset = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * spawnDistanceFromPlayer;
-            Vector2 spawnPos = (Vector2)playerTransform.position + offset;
-
-            // 确保在生成区域内
-            spawnPos.x = Mathf.Clamp(spawnPos.x, -spawnAreaSize.x / 2, spawnAreaSize.x / 2);
-            spawnPos.y = Mathf.Clamp(spawnPos.y, -spawnAreaSize.y / 2, spawnAreaSize.y / 2);
-
-            // 检查是否有障碍物
-            if (!Physics2D.OverlapCircle(spawnPos, 1f, obstacleLayer))
-            {
-                return spawnPos;
-            }
+            case 0: // 左边
+                x = min.x - extraDistance;
+                y = Random.Range(min.y, max.y);
+                break;
+            case 1: // 右边
+                x = max.x + extraDistance;
+                y = Random.Range(min.y, max.y);
+                break;
+            case 2: // 下边
+                x = Random.Range(min.x, max.x);
+                y = min.y - extraDistance;
+                break;
+            case 3: // 上边
+                x = Random.Range(min.x, max.x);
+                y = max.y + extraDistance;
+                break;
         }
 
-        return GetRandomPositionInArea();
+        return new Vector2(x, y);
     }
 
     private Vector2 GetRandomPositionInArea()
@@ -198,7 +239,10 @@ public class EnemySpawner : MonoBehaviour
         activeEnemies.Remove(enemy);
         OnEnemyDeath?.Invoke(enemy);
     }
-
+    public void OnBossDeath()
+    {
+        OnBossDefeated?.Invoke();  
+    }
     //public void SetEndlessMode(bool enabled)
     //{
     //    isEndlessMode = enabled;
@@ -218,6 +262,31 @@ public class EnemySpawner : MonoBehaviour
         {
             if (enemy != null)
                 Destroy(enemy);
+        }
+        activeEnemies.Clear();
+    }
+
+    public void　ResetEnemySpawner()
+    {
+        gameTimer = 0f;
+        bossSpawned = false;
+        if (waves != null || waveSpawnTimers != null)
+        {
+            foreach (var wave in waves)
+            {
+                waveSpawnTimers[wave] = 0f;
+            }
+        }
+        
+        foreach (var enemy in activeEnemies)
+        {
+            if (enemy != null)
+            {
+                OnEnemyDeath?.Invoke(enemy);
+                TriangleMonster triangle = enemy.GetComponent<TriangleMonster>();
+                if (triangle != null)
+                    triangle.ReturnToPool();
+            }
         }
         activeEnemies.Clear();
     }

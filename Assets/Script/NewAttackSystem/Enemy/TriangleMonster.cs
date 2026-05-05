@@ -38,8 +38,8 @@ public class TriangleMonster : Enemy,IPooledable
         isAlive = false;
 
         DropItem();
-        GameManager.Instance.AddGold(GameData.Instance.TriangleMonsterGold);
-        GameManager.Instance.AddKill() ;
+        GameData.Instance.AddGold(GameData.Instance.TriangleMonsterGold);
+        GameData.Instance.AddKill() ;
 
         GameObject deathEffect = Instantiate(deathEffectPrefab, transform.position, Quaternion.identity);
         ParticleSystem ps = deathEffect.GetComponent<ParticleSystem>();
@@ -53,8 +53,7 @@ public class TriangleMonster : Enemy,IPooledable
             Destroy(deathEffect, 2f);
         }
 
-         EnemySpawner.Instance.OnEnemyKilled(deathEffect);
-
+         EnemySpawner.Instance.OnEnemyKilled(this.gameObject);
         ReturnToPool();
     }
 
@@ -86,13 +85,21 @@ public class TriangleMonster : Enemy,IPooledable
 
         
     }
-
+    public void ResetEnemy()
+    {
+        currentHealth = maxHealth;
+        isAlive = true;
+        Model.color = new Color(238f / 255f, 78f / 255f, 78f / 255f);
+    }
     public void ReturnToPool()
     {
-        Debug.Log($"{id}对象已回收");
         ObjectPool.Instance.ReturnToPool("TriangleMonster", gameObject);
     }
-
+    protected override void OnEnable()
+    {
+        base.OnEnable();
+        ResetEnemy();
+    }
     public void OnObjectSpawn()
     {
         id = "TriangleMonster";

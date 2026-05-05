@@ -18,8 +18,7 @@ public class LevelUPOption
     public enum LevelUPType
     {
         playerSpeedUp,
-        bulletSpeedUp,
-        shootIntervalUp,
+        attackSpeedUp,
         AttackUp,
         HealthUp,
     }
@@ -35,18 +34,14 @@ public class LevelUPOption
             case LevelUPType.playerSpeedUp:
                 gameData.playerSpeed += value;
                 break;
-            case LevelUPType.bulletSpeedUp:
-                gameData.bulletSpeed += value;
-                break;
-            case LevelUPType.shootIntervalUp:
-                gameData.shootInterval/= value;
-                gameData.shootInterval = Mathf.Clamp(gameData.shootInterval, 0.1f, 1f);
+            case LevelUPType.attackSpeedUp:
+                gameData.AddAttackSpeedBonus(value);
                 break;
             case LevelUPType.AttackUp:
-                gameData.bulletDamage += value; 
+                gameData.AddAttackFlat(value); 
                 break;
             case LevelUPType.HealthUp:
-                gameData.playerMaxHealth += value;
+                gameData.AddMaxHealthBonus(value);
                 break;
             default:
                 break;

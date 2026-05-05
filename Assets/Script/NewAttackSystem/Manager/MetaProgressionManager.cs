@@ -93,13 +93,13 @@ public class MetaProgressionManager : MonoBehaviour
         }
 
         // 解锁默认武器
-        foreach (var weapon in allWeapons)
-        {
-            if (weapon.unlockedByDefault && !unlockedWeapons.Contains(weapon))
-            {
-                unlockedWeapons.Add(weapon);
-            }
-        }
+        //foreach (var weapon in allWeapons)
+        //{
+        //    if (weapon.unlockedByDefault && !unlockedWeapons.Contains(weapon))
+        //    {
+        //        unlockedWeapons.Add(weapon);
+        //    }
+        //}
     }
     #endregion
 
@@ -175,10 +175,10 @@ public class MetaProgressionManager : MonoBehaviour
         {
             if (!unlockedWeapons.Contains(weapon))
             {
-                if (CheckUnlockCondition(weapon))
-                {
-                    UnlockWeapon(weapon);
-                }
+                //if (CheckUnlockCondition(weapon))
+                //{
+                //    UnlockWeapon(weapon);
+                //}
             }
         }
     }
@@ -199,19 +199,19 @@ public class MetaProgressionManager : MonoBehaviour
         };
     }
 
-    private bool CheckUnlockCondition(WeaponData weapon)
-    {
-        if (weapon.unlockCost > 0) return false;
+    //private bool CheckUnlockCondition(WeaponData weapon)
+    //{
+    //    if (weapon.unlockCost > 0) return false;
 
-        return weapon.unlockCondition switch
-        {
-            "win_standard" => gamesWon >= 1,
-            "kill_500" => totalKills >= 500,
-            "reach_level_20" => endlessModeBestLevel >= 20,
-            "" => false,
-            _ => false
-        };
-    }
+    //    return weapon.unlockCondition switch
+    //    {
+    //        "win_standard" => gamesWon >= 1,
+    //        "kill_500" => totalKills >= 500,
+    //        "reach_level_20" => endlessModeBestLevel >= 20,
+    //        "" => false,
+    //        _ => false
+    //    };
+    //}
 
     public void UnlockCharacter(CharacterData character)
     {
@@ -251,9 +251,9 @@ public class MetaProgressionManager : MonoBehaviour
     public bool TryPurchaseWeapon(WeaponData weapon)
     {
         if (unlockedWeapons.Contains(weapon)) return false;
-        if (totalGold < weapon.unlockCost) return false;
+        //if (totalGold < weapon.unlockCost) return false;
 
-        totalGold -= weapon.unlockCost;
+        //totalGold -= weapon.unlockCost;
         unlockedWeapons.Add(weapon);
         OnWeaponUnlocked?.Invoke(weapon);
         Save();
@@ -376,17 +376,17 @@ public class MetaProgressionManager : MonoBehaviour
     #region 应用永久加成到新游戏
     public void ApplyPermanentBonusesToGameManager()
     {
-        var gm = GameManager.Instance;
+        var gm = GameData.Instance;
         if (gm == null) return;
 
-        gm.globalDamageMultiplier += permanentDamageBonus;
-        gm.playerMaxHealth += permanentHealthBonus;
+        gm.AddDamageMultiplier(permanentDamageBonus);
+        gm.AddMaxHealthBonus(permanentHealthBonus);
         gm.playerCurrentHealth = gm.playerMaxHealth;
-        gm.playerMoveSpeed += permanentSpeedBonus;
+        gm.playerSpeed += permanentSpeedBonus;
         gm.expMultiplier += permanentExpBonus;
         gm.goldMultiplier += permanentGoldBonus;
-        gm.globalCritRate += permanentCritRateBonus;
-        gm.globalCritDamage += permanentCritDamageBonus;
+        gm.AddCriticalRate(permanentCritRateBonus);
+        gm.AddCriticalDamage(permanentCritDamageBonus);
         gm.pickupRange += permanentPickupRangeBonus;
 
         gm.AddGold(startingGold);

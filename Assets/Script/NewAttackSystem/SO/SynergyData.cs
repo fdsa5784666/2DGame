@@ -93,12 +93,12 @@ public class SynergyData : ScriptableObject
     /// <summary>
     /// 应用羁绊效果到游戏
     /// </summary>
-    public void ApplyEffect(int tier, GameManager gameManager, WeaponSlotManager slotManager)
+    public void ApplyEffect(int tier, GameData gameData, WeaponSlotManager slotManager)
     {
         if (tier < 0 || tier >= tierEffects.Length) return;
 
         var effect = tierEffects[tier];
-        effect.Apply(gameManager, slotManager);
+        effect.Apply(gameData, slotManager);
     }
 }
 
@@ -108,7 +108,7 @@ public struct SynergyTierEffect
     [Tooltip("阶段描述")]
     public string description;
 
-    [Header("数值加成")]
+    [Header("数值加成(百分比加成)")]
     public float damageBonus;
     public float attackSpeedBonus;
     public float critRateBonus;
@@ -120,18 +120,13 @@ public struct SynergyTierEffect
     public string specialEffectId;
     public string specialEffectParams;
 
-    public void Apply(GameManager gameManager, WeaponSlotManager slotManager)
+    public void Apply(GameData gameData, WeaponSlotManager slotManager)
     {
-        gameManager.globalDamageMultiplier += damageBonus;
-        gameManager.globalAttackSpeedBonus += attackSpeedBonus;
-        gameManager.globalCritRate += critRateBonus;
-        gameManager.globalCritDamage += critDamageBonus;
-        gameManager.playerMaxHealth += maxHealthBonus;
-        gameManager.playerMoveSpeed += moveSpeedBonus;
-
-        if (!string.IsNullOrEmpty(specialEffectId))
-        {
-            gameManager.ApplySpecialEffect(specialEffectId, specialEffectParams);
-        }
+        gameData.AddDamageMultiplier(damageBonus);
+        gameData.AddAttackSpeedBonus(attackSpeedBonus);
+        gameData.AddCriticalRate(critRateBonus);
+        gameData.AddCriticalDamage(critDamageBonus);
+        //gameData.AddMaxHealthBonus(maxHealthBonus);
+        //gameData.AddSpeedBonus(moveSpeedBonus);
     }
 }

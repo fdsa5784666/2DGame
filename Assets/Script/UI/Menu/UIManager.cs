@@ -8,14 +8,20 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager instance;
+    public static UIManager instance { get; private set; }
+    #region UI初始化需要的变量
+    [Header("UI初始化需要的变量")]
+    public GameObject pauseSignal;
+    public GameObject gameMode;
+    #endregion
 
+    #region 游戏内菜单变量
+    [Header("游戏内菜单变量")]
     public GameObject menu;
     public Button menuButton;
     public Transform Text1;
     public Transform Text2;
     public Transform Text3;
-
     private TextMeshProUGUI Text1_UI;
     private TextMeshProUGUI Text2_UI;
     private TextMeshProUGUI Text3_UI;
@@ -23,6 +29,8 @@ public class UIManager : MonoBehaviour
     private RectTransform Text2_Rect;
     private RectTransform Text3_Rect;
 
+    public GameObject panel_GameOver;
+    #endregion
     private Stack<GameObject> panelStack = new Stack<GameObject>();
 
     private void Awake()
@@ -43,6 +51,8 @@ public class UIManager : MonoBehaviour
         Text3_UI = Text3.gameObject.GetComponent<TextMeshProUGUI>();
 
         menuButton.onClick.AddListener(OnButtonClick_Menu);
+        if (SynergyManager.Instance == null) Debug.LogError("instance未赋值");
+        SynergyManager.Instance.OnSynergyUpdated += ShowSynergySignal;
     }
     void Update()
     {
@@ -87,6 +97,7 @@ public class UIManager : MonoBehaviour
             OpenPanel(menu);
         else
             CloseAllPanel();
+        Debug.Log($"当前UI数量是{panelStack.Count}");
     }
 
     public void OpenPanel(GameObject panel)
@@ -107,14 +118,12 @@ public class UIManager : MonoBehaviour
     {
         if (panelStack.Count > 1)
         {
-            GameObject topPanel = panelStack.Pop();
-            topPanel.SetActive(false);
+            panelStack.Pop().SetActive(false);
         }
         else if(panelStack.Count == 1) 
         {
-                GameObject topPanel = panelStack.Pop();
-                topPanel.SetActive(false);
-                GameData.Instance.Pause();
+            panelStack.Pop().SetActive(false);
+            GameData.Instance.Resume();
         }
 
 
@@ -123,8 +132,7 @@ public class UIManager : MonoBehaviour
     {
         while (panelStack.Count > 0)
         {
-            panelStack.Pop().SetActive(false);
-            GameData.Instance.Pause();
+            CloseTopPanel();
         }
     }
 
@@ -140,8 +148,20 @@ public class UIManager : MonoBehaviour
         }
         else
         {
+            panel_GameOver.SetActive(true);
             Debug.Log("玩家失败,游戏结束");
         }
+    }
+    
+    public void ShowSynergySignal(SynergyConfig config,int tier)
+    {
+        Debug.Log($"触发了{config.name}的{tier + 1}级增益");
+    }
+    public void ResetUI()
+    {
+        CloseAllPanel();
+        pauseSignal.SetActive(false);
+        gameMode.SetActive(false);
     }
 }
 

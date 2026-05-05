@@ -79,7 +79,7 @@ public class UpgradeData : ScriptableObject
     /// <summary>
     /// 检查是否满足出现条件
     /// </summary>
-    public virtual bool CanAppear(int playerLevel, WeaponSlotManager slotManager, GameManager gameManager)
+    public virtual bool CanAppear(int playerLevel, WeaponSlotManager slotManager, GameData gameData)
     {
         // 等级条件
         if (playerLevel < minPlayerLevel || playerLevel > maxPlayerLevel)
@@ -99,7 +99,7 @@ public class UpgradeData : ScriptableObject
         // 标签条件
         foreach (var tag in requiredTags)
         {
-            if (slotManager.GetTagCount(tag) == 0)
+            if (slotManager.GetWeaponCountByTag(tag) == 0)
                 return false;
         }
 
@@ -121,7 +121,7 @@ public class UpgradeData : ScriptableObject
     /// <summary>
     /// 应用升级效果
     /// </summary>
-    public void Apply(WeaponSlotManager slotManager, GameManager gameManager)
+    public void Apply(WeaponSlotManager slotManager, GameData gameData)
     {
         currentSelectionCount++;
 
@@ -132,16 +132,13 @@ public class UpgradeData : ScriptableObject
                 break;
             case UpgradeEffectType.NewWeapon:
                 if (newWeapon != null)
-                    slotManager.TryAddWeapon(newWeapon);
+                    slotManager.AcquireWeapon(newWeapon);
                 break;
-            case UpgradeEffectType.Fragment:
-                slotManager.AddVirtualTag(fragmentTag);
-                break;
+            //case UpgradeEffectType.Fragment:
+                //slotManager.AddVirtualTag(fragmentTag);
+                //break;
             case UpgradeEffectType.GlobalBonus:
-                ApplyGlobalBonus(gameManager);
-                break;
-            case UpgradeEffectType.MechanicChange:
-                gameManager.ApplySpecialEffect(specialEffectId, specialEffectParams);
+                ApplyGlobalBonus(gameData);
                 break;
         }
     }
@@ -149,47 +146,48 @@ public class UpgradeData : ScriptableObject
     private void ApplyStatBonus(WeaponSlotManager slotManager)
     {
         // 如果有指定武器，只对该武器生效
-        if (!string.IsNullOrEmpty(requiredWeaponName))
-        {
-            var weapon = slotManager.GetWeaponByName(requiredWeaponName);
-            if (weapon != null)
-            {
-                weapon.damageBonus += damageBonus;
-                weapon.attackSpeedBonus += attackSpeedBonus;
-                weapon.projectileBonus += projectileBonus;
-                weapon.pierceBonus += pierceBonus;
-                weapon.bulletSpeedBonus += bulletSpeedBonus;
-                weapon.bulletSizeBonus += bulletSizeBonus;
-                weapon.rangeBonus += rangeBonus;
-            }
-        }
-        else
-        {
+        //if (!string.IsNullOrEmpty(requiredWeaponName))
+        //{
+        //    var weapon = slotManager.GetWeaponByName(requiredWeaponName);
+        //    if (weapon != null)
+        //    {
+        //        weapon.damageBonus += damageBonus;
+        //        weapon.attackSpeedBonus += attackSpeedBonus;
+        //        weapon.projectileBonus += projectileBonus;
+        //        weapon.pierceBonus += pierceBonus;
+        //        weapon.bulletSpeedBonus += bulletSpeedBonus;
+        //        weapon.bulletSizeBonus += bulletSizeBonus;
+        //        weapon.rangeBonus += rangeBonus;
+        //    }
+        //}
+        //else
+        //{
             // 否则对所有武器生效
-            foreach (var weapon in slotManager.GetAllWeapons())
-            {
-                weapon.damageBonus += damageBonus;
-                weapon.attackSpeedBonus += attackSpeedBonus;
-                weapon.projectileBonus += projectileBonus;
-                weapon.pierceBonus += pierceBonus;
-                weapon.bulletSpeedBonus += bulletSpeedBonus;
-                weapon.bulletSizeBonus += bulletSizeBonus;
-                weapon.rangeBonus += rangeBonus;
-            }
-        }
+        //    foreach (var weapon in slotManager.GetAllWeapons())
+        //    {
+        //        weapon.damageBonus += damageBonus;
+        //        weapon.attackSpeedBonus += attackSpeedBonus;
+        //        weapon.projectileBonus += projectileBonus;
+        //        weapon.pierceBonus += pierceBonus;
+        //        weapon.bulletSpeedBonus += bulletSpeedBonus;
+        //        weapon.bulletSizeBonus += bulletSizeBonus;
+        //        weapon.rangeBonus += rangeBonus;
+        //    }
+        //}
     }
 
-    private void ApplyGlobalBonus(GameManager gameManager)
+    private void ApplyGlobalBonus(GameData gameData)
     {
-        gameManager.globalDamageMultiplier += globalDamageBonus;
-        gameManager.expMultiplier += expMultiplierBonus;
-        gameManager.goldMultiplier += goldMultiplierBonus;
-        gameManager.playerMaxHealth += maxHealthBonus;
-        gameManager.playerMoveSpeed += moveSpeedBonus;
-        gameManager.globalCritRate += critRateBonus;
-        gameManager.globalCritDamage += critDamageBonus;
-        gameManager.pickupRange += pickupRangeBonus;
+        gameData.AddDamageMultiplier(globalDamageBonus);
+        gameData.expMultiplier += expMultiplierBonus;
+        gameData.goldMultiplier += goldMultiplierBonus;
+        gameData.AddMaxHealthBonus(maxHealthBonus);
+        gameData.playerSpeed += moveSpeedBonus;
+        gameData.AddCriticalRate(critRateBonus);
+        gameData.AddCriticalDamage(critDamageBonus);
+        gameData.pickupRange += pickupRangeBonus;
     }
+
 
     /// <summary>
     /// 重置选择次数（新游戏时调用）

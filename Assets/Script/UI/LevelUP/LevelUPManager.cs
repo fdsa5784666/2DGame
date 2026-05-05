@@ -122,7 +122,7 @@ public class LevelUPManager : MonoBehaviour
         //GameData.Instance.AddSplitCount(chosen.splitBonus);
         //GameData.Instance.AddExplosionRadius(chosen.explosionRadiusBonus);
         chosen.Apply(GameData.Instance.gameObject);
-        GameData.Instance.Pause();
+        GameData.Instance.Resume();
         GameData.Instance.FullHP();
 
         //此处为选择升级效果的最后 在此加入特效

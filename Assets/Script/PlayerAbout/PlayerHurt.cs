@@ -74,8 +74,8 @@ public class PlayerHurt : MonoBehaviour, IDamageable
             HealthView_UI.fillAmount = GameData.Instance.playerCurrentHealth / GameData.Instance.playerMaxHealth;
             Text_UI.text = "Hp " + GameData.Instance.playerCurrentHealth.ToString() + "/" + GameData.Instance.playerMaxHealth.ToString();
         }
-        else if (GameData.Instance.playerCurrentHealth > 999999)
-            Text_UI.text = "Hp beyond 1M";
+        //else if (GameData.Instance.playerCurrentHealth > 999999)
+        //    Text_UI.text = "Hp beyond 1M";
 
         timer -= Time.deltaTime;
     }
@@ -111,6 +111,12 @@ public class PlayerHurt : MonoBehaviour, IDamageable
     public void TakeDamage(float damage, bool isCritical = false)
     {
         GameData.Instance.playerCurrentHealth -= damage;
+
+        if (GameData.Instance.playerCurrentHealth <= 0)
+        {
+            GameData.Instance.GameOver();
+            return;
+        }
         //开始协程 执行闪屏特效
         if (damageFlashImage != null)
         {
@@ -120,6 +126,7 @@ public class PlayerHurt : MonoBehaviour, IDamageable
             }
             flashCoroutine = StartCoroutine(FlashCoroutine());
         }
+
     }
 
     public Transform GetTransform()

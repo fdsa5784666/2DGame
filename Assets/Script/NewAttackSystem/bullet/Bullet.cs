@@ -65,8 +65,6 @@ public class Bullet : MonoBehaviour, IPooledable
         //{
         //    StartCoroutine(HomingRoutine());
         //}
-
-        Debug.Log(info.lifeTime);
         // 生命周期
         Invoke(nameof(Return), info.lifeTime);
     }
@@ -134,7 +132,6 @@ public class Bullet : MonoBehaviour, IPooledable
             remainingPierce--;
             if (remainingPierce <= 0)
             {
-                Debug.Log("Bullet pierce exhausted");
                 ReturnToPool();
             }
         }

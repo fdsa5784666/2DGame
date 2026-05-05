@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class QuitButton : MonoBehaviour
 {
-    public GameObject menu;
 
-    public void QuitButtonPress()
+    public void OnClick_Exit()
     {
-        Debug.Log("确认一下，返回标题界面");
+        Application.Quit();
     }
 }

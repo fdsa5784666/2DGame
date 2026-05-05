@@ -13,9 +13,9 @@ public class AttackManager : MonoBehaviour
     [SerializeField] private LayerMask enemyLayer;
     [SerializeField] private bool autoAttack = true;
 
-    // 武器控制器映射
-    private Dictionary<WeaponInstance, WeaponController> controllerMap = new();
-    private List<WeaponController> activeControllers = new();
+    //// 武器控制器映射
+    //private Dictionary<WeaponInstance, WeaponController> controllerMap = new();
+    //private List<WeaponController> activeControllers = new();
 
     // 缓存
     //private Transform nearestEnemy;
@@ -40,21 +40,21 @@ public class AttackManager : MonoBehaviour
 
         if (slotManager != null)
         {
-            slotManager.OnWeaponAdded += OnWeaponAdded;
-            slotManager.OnWeaponUpgraded += OnWeaponUpgraded;
-            slotManager.OnWeaponRemoved += OnWeaponRemoved;
+            //slotManager.OnWeaponAdded += OnWeaponAdded;
+            //slotManager.OnWeaponUpgraded += OnWeaponUpgraded;
+            //slotManager.OnWeaponRemoved += OnWeaponRemoved;
 
-            foreach (var weapon in slotManager.EquippedWeapons)
-            {
-                OnWeaponAdded(weapon);
-            }
+            //foreach (var weapon in slotManager.EquippedWeapons)
+            //{
+            //    OnWeaponAdded(weapon);
+            //}
         }
     }
 
     void Update()
     {
         if (!autoAttack) return;
-        if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.Playing) return;
+        if (GameData.Instance != null && GameData.Instance.CurrentState != EGameState.Playing) return;
 
         //nearestEnemyUpdateTimer -= Time.deltaTime;
         //if (nearestEnemyUpdateTimer <= 0)
@@ -70,61 +70,61 @@ public class AttackManager : MonoBehaviour
         //}
     }
 
-    void OnDestroy()
-    {
-        if (slotManager != null)
-        {
-            slotManager.OnWeaponAdded -= OnWeaponAdded;
-            slotManager.OnWeaponUpgraded -= OnWeaponUpgraded;
-            slotManager.OnWeaponRemoved -= OnWeaponRemoved;
-        }
-    }
+    //void OnDestroy()
+    //{
+    //    if (slotManager != null)
+    //    {
+    //        slotManager.OnWeaponAdded -= OnWeaponAdded;
+    //        slotManager.OnWeaponUpgraded -= OnWeaponUpgraded;
+    //        slotManager.OnWeaponRemoved -= OnWeaponRemoved;
+    //    }
+    //}
 
-    #region 武器事件处理
-    private void OnWeaponAdded(WeaponInstance weapon)
-    {
-        var controller = CreateController(weapon);
-        if (controller != null)
-        {
-            controllerMap[weapon] = controller;
-            activeControllers.Add(controller);
-            controller.Initialize(weapon, playerTransform, enemyLayer);
-        }
-    }
+    //#region 武器事件处理
+    //private void OnWeaponAdded(WeaponInstance weapon)
+    //{
+    //    var controller = CreateController(weapon);
+    //    if (controller != null)
+    //    {
+    //        controllerMap[weapon] = controller;
+    //        activeControllers.Add(controller);
+    //        controller.Initialize(weapon, playerTransform, enemyLayer);
+    //    }
+    //}
 
-    private void OnWeaponUpgraded(WeaponInstance weapon, int newLevel)
-    {
-        if (controllerMap.TryGetValue(weapon, out var controller))
-        {
-            controller.OnUpgraded(newLevel);
-        }
-    }
+    //private void OnWeaponUpgraded(WeaponInstance weapon, int newLevel)
+    //{
+    //    if (controllerMap.TryGetValue(weapon, out var controller))
+    //    {
+    //        controller.OnUpgraded(newLevel);
+    //    }
+    //}
 
-    private void OnWeaponRemoved(WeaponInstance weapon)
-    {
-        if (controllerMap.TryGetValue(weapon, out var controller))
-        {
-            controller.Cleanup();
-            activeControllers.Remove(controller);
-            controllerMap.Remove(weapon);
-        }
-    }
-    #endregion
+    //private void OnWeaponRemoved(WeaponInstance weapon)
+    //{
+    //    if (controllerMap.TryGetValue(weapon, out var controller))
+    //    {
+    //        controller.Cleanup();
+    //        activeControllers.Remove(controller);
+    //        controllerMap.Remove(weapon);
+    //    }
+    //}
+    //#endregion
 
-    #region 控制器创建
-    private WeaponController CreateController(WeaponInstance weapon)
-    {
-        return weapon.Data.weaponType switch
-        {
-            EWeaponType.Ranged => new RangedWeaponController(),
-            //EWeaponType.Melee => new MeleeWeaponController(),
-            //EWeaponType.Laser => new LaserWeaponController(),
-            //EWeaponType.AoE => new AoEWeaponController(),
-            //EWeaponType.Summon => new SummonWeaponController(),
-            _ => new RangedWeaponController()
-        };
-    }
-    #endregion
+    //#region 控制器创建
+    //private WeaponController CreateController(WeaponInstance weapon)
+    //{
+    //    return weapon.Data.weaponType switch
+    //    {
+    //        EWeaponType.Ranged => new RangedWeaponController(),
+    //        //EWeaponType.Melee => new MeleeWeaponController(),
+    //        //EWeaponType.Laser => new LaserWeaponController(),
+    //        //EWeaponType.AoE => new AoEWeaponController(),
+    //        //EWeaponType.Summon => new SummonWeaponController(),
+    //        _ => new RangedWeaponController()
+    //    };
+    //}
+    //#endregion
 
     #region 敌人查找
     //private Transform FindNearestEnemy()
@@ -183,10 +183,10 @@ public class AttackManager : MonoBehaviour
         //}
     }
 
-    public WeaponController GetController(WeaponInstance weapon)
-    {
-        controllerMap.TryGetValue(weapon, out var controller);
-        return controller;
-    }
+    //public WeaponController GetController(WeaponInstance weapon)
+    //{
+    //    controllerMap.TryGetValue(weapon, out var controller);
+    //    return controller;
+    //}
     #endregion
 }

@@ -6,6 +6,8 @@ using UnityEngine;
 public class BulletBaseData : ScriptableObject
 {
     [Header("=== 基础属性 ===")]
+    [Tooltip("子弹基础伤害")]
+    public float damage = 10f;
     [Tooltip("子弹飞行速度")]
     public float speed = 8f;
     [Tooltip("子弹存活时间（秒）")]

@@ -8,9 +8,6 @@ public class ContinueButton : MonoBehaviour
 
     public void ContinueButtonPress()
     {
-        if (menu.activeSelf == false)
-            UIManager.instance.OpenPanel(menu);
-        else
             UIManager.instance.CloseAllPanel();
     }
 }

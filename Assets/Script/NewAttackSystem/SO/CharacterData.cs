@@ -45,19 +45,19 @@ public class CharacterData : ScriptableObject
     /// </summary>
     public void ApplyToGameManager()
     {
-        if (GameManager.Instance == null)
+        if (GameData.Instance == null)
         {
-            Debug.LogError("GameManager 不存在！");
+            Debug.LogError("GameData 不存在！");
             return;
         }
 
-        var gm = GameManager.Instance;
-        gm.playerMaxHealth += maxHealthBonus;
+        var gm = GameData.Instance;
+        gm.AddMaxHealthBonus(maxHealthBonus);
         gm.playerCurrentHealth = gm.playerMaxHealth;
-        gm.playerMoveSpeed += moveSpeedBonus;
-        gm.globalDamageMultiplier *= (1 + damageBonus);
-        gm.globalAttackSpeedBonus += attackSpeedBonus;
-        gm.globalCritRate += critRateBonus;
+        gm.playerSpeed += moveSpeedBonus;
+        gm.AddDamageMultiplier(1 + damageBonus);
+        gm.AddAttackSpeedBonus(attackSpeedBonus);
+        gm.AddCriticalRate(critRateBonus);
     }
 }
 
