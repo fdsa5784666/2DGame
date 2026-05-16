@@ -217,12 +217,20 @@ public class WeaponSlotManager : MonoBehaviour
     }
     public void ResetWeaponSlot()
     {
-        equippedWeapons.Clear(); 
+        // 从后往前删除，避免索引错乱
+        for (int i = equippedWeapons.Count - 1; i >= 0; i--)
+        {
+            DiscardWeapon(i);
+        }
+
+        // 保险起见再清一次
+        equippedWeapons.Clear();
     }
     // ======= 私有方法 ======
 
     private WeaponInstance CreateWeaponInstance(WeaponData data, int starLevel)
     {
+
         GameObject weaponObj = new GameObject($"Weapon_{data.weaponName}({starLevel}星)");
         weaponObj.transform.SetParent(transform);
 

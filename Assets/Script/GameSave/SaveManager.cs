@@ -176,4 +176,16 @@ public class SaveManager : MonoBehaviour
 
     public bool IsSaveLoaded => currentSave != null;
 
+    /// <summary>
+    /// 保存结算内容
+    /// </summary>
+    public void AddRewardOnGameEnd(int earnedGold, int totalKill)
+    {
+        Modify(save =>
+        {
+            save.gold += earnedGold;
+            save.totalKill += totalKill;
+            save.totalGamesPlayed++;
+        });
+    }
 }

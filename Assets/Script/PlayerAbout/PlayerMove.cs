@@ -34,8 +34,8 @@ public class PlayerMove : MonoBehaviour
         if (isMove)
         {
 
-            player.transform.position += new Vector3(horizontalSpeed * Time.deltaTime * GameData.Instance.playerSpeed,
-                                                     verticalSpeed * Time.deltaTime * GameData.Instance.playerSpeed, 0);
+            player.transform.position += new Vector3(horizontalSpeed * Time.deltaTime * GameData.Instance.PlayerSpeed,
+                                                     verticalSpeed * Time.deltaTime * GameData.Instance.PlayerSpeed, 0);
         }
     }
 }

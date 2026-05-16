@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: Wysa436sVHOa7uDxct25BFgPoAiuSRdW9mJZPI3LyXbIiFuDsFHYP/w=
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - name: {instanceID: 0}
+  - youXiaObj: {instanceID: 0}
+  - zhanShiObj: {instanceID: 0}
+  - faShiObj: {instanceID: 0}
+  - luckyGuyObj: {instanceID: 0}
+  - youXia: {fileID: 11400000, guid: a3063c140c92f504a8b6214b48cf870e, type: 2}
+  - zhanShi: {instanceID: 0}
+  - faShi: {instanceID: 0}
+  - luckyGuy: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

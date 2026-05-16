@@ -12,6 +12,8 @@ public class LevelUPManager : MonoBehaviour
     public Canvas mainCanvas;
     private GameObject currentPanel;
 
+
+
     [Header("随机规则")]
     [SerializeField]
     private bool allowDuplicateOptions = false;

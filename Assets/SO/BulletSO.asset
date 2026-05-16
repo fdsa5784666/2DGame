@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BulletSO
   m_EditorClassIdentifier: 
   damage: 20
-  speed: 10
+  speed: 20
   lifeTime: 5
   size: 1
   pierceCount: 1

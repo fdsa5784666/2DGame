@@ -16,11 +16,11 @@ public class CharacterData : ScriptableObject
     public WeaponData startingWeapon;
 
     [Header("=== 初始属性加成 ===")]
-    [Tooltip("最大生命值加成（固定值）")]
+    [Tooltip("最大生命值加成（百分比 1+x）")]
     public float maxHealthBonus = 0f;
     [Tooltip("移动速度加成（固定值）")]
     public float moveSpeedBonus = 0f;
-    [Tooltip("伤害加成（百分比，1 = 100%）")]
+    [Tooltip("伤害加成（百分比 1+x）")]
     public float damageBonus = 0f;
     [Tooltip("攻击速度加成（百分比）")]
     public float attackSpeedBonus = 0f;
@@ -31,7 +31,7 @@ public class CharacterData : ScriptableObject
     public List<WeaponData> additionalStartingWeapons;
 
     [Header("=== 角色专属升级池（为空则使用通用池）===")]
-    public List<UpgradeData> exclusiveUpgrades;
+    public List<LevelUPOption> exclusiveUpgrades;
 
     [Header("=== 解锁条件 ===")]
     public bool unlockedByDefault = true;
@@ -43,7 +43,7 @@ public class CharacterData : ScriptableObject
     /// <summary>
     /// 应用角色初始属性到 GameManager
     /// </summary>
-    public void ApplyToGameManager()
+    public void ApplyToGameManager(bool Apply)
     {
         if (GameData.Instance == null)
         {
@@ -52,12 +52,24 @@ public class CharacterData : ScriptableObject
         }
 
         var gm = GameData.Instance;
-        gm.AddMaxHealthBonus(maxHealthBonus);
-        gm.playerCurrentHealth = gm.playerMaxHealth;
-        gm.playerSpeed += moveSpeedBonus;
-        gm.AddDamageMultiplier(1 + damageBonus);
-        gm.AddAttackSpeedBonus(attackSpeedBonus);
-        gm.AddCriticalRate(critRateBonus);
+
+        if (Apply)
+        {
+            gm.AddMaxHealthBonus(maxHealthBonus);
+            gm.SetCharacter(this);
+            gm.playerCurrentHealth = gm.playerMaxHealth;
+            gm.PlayerSpeedAdd(moveSpeedBonus);
+            gm.AddDamageMultiplier(damageBonus);
+            gm.AddAttackSpeedBonus(attackSpeedBonus);
+            gm.AddCriticalRate(critRateBonus);
+            Debug.Log("加成已应用");
+        }
+        else
+        {
+            gm.CancelCharacterBonus();
+            gm.SetCharacter(null);
+        }
     }
+
 }
 

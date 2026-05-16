@@ -129,7 +129,8 @@ public abstract class Enemy : MonoBehaviour,IDamageable,IDropItem
         if (Random.value <= GameData.Instance.HealthPotionRandomValue)
         {
             Debug.Log($"{id}掉落了血瓶");
-            Instantiate(GameData.Instance.HealthPotionPrefab, transform.position, Quaternion.identity);
+            GameObject obj = Instantiate(GameData.Instance.HealthPotionPrefab, transform.position, Quaternion.identity);
+            GameData.Instance.activeNonpooledObj.Add(obj);
         }
     }
     #endregion

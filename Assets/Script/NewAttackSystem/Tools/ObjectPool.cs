@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -25,6 +26,10 @@ public class ObjectPool : MonoBehaviour
     public List<Pool> pools;
     //管理各类池
     private Dictionary<string, Queue<GameObject>> poolDictionary;
+    //记录激活对象
+    Dictionary<string,HashSet<GameObject>> activeByTag = new Dictionary<string,HashSet<GameObject>>();
+
+
     //初始化池子和池子字典信息
     private void Awake()
     {
@@ -43,6 +48,7 @@ public class ObjectPool : MonoBehaviour
                 objectPool.Enqueue (obj);
             }
             poolDictionary.Add(pool.tag, objectPool);
+            activeByTag[pool.tag] = new HashSet<GameObject>();
         }
     }
     /// <summary>
@@ -65,10 +71,6 @@ public class ObjectPool : MonoBehaviour
     /// 从池子取出对象 
     /// 池子都在一起 所有需要池子对象可直接调用获取
     /// </summary>
-    /// <param name="tag"></param>
-    /// <param name="position"></param>
-    /// <param name="angleDegrees"></param>
-    /// <returns></returns>
     public GameObject SpawnFromPool(string tag,Vector2 position,float angleDegrees = 0f)
     {
         //寻找是否有对应类型对象池
@@ -92,20 +94,24 @@ public class ObjectPool : MonoBehaviour
         objectToSpawn.transform.rotation = Quaternion.Euler(0, 0, angleDegrees);
         objectToSpawn.SetActive(true);
 
+        if (!activeByTag.ContainsKey(tag))
+            activeByTag[tag] = new HashSet<GameObject>();
+        activeByTag[tag].Add(objectToSpawn);
+
         IPooledable pooledObject = objectToSpawn.GetComponent<IPooledable>();
         if (pooledObject != null)
         {
             pooledObject.OnObjectSpawn();
         }
+
+
         return objectToSpawn;
+
+
      }
     /// <summary>
     /// 第二个参数可传Vector3的重载
     /// </summary>
-    /// <param name="tag"></param>
-    /// <param name="position"></param>
-    /// <param name="angleDegrees"></param>
-    /// <returns></returns>
     public GameObject SpawnFromPool(string tag, Vector3 position, float angleDegrees = 0f)
     {
         Vector2 V2Pos = new Vector2(position.x, position.y);
@@ -114,10 +120,6 @@ public class ObjectPool : MonoBehaviour
     /// <summary>
     /// 第二个参数可传transform的重载
     /// </summary>
-    /// <param name="tag"></param>
-    /// <param name="T_position"></param>
-    /// <param name="angleDegrees"></param>
-    /// <returns></returns>
     public GameObject SpawnFromPool(string tag, Transform T_position, float angleDegrees = 0f)
     {
         Vector2 V2Pos = new Vector2(T_position.position.x,T_position.position.y);
@@ -127,8 +129,6 @@ public class ObjectPool : MonoBehaviour
     /// <summary>
     /// 还回池子逻辑
     /// </summary>
-    /// <param name="tag"></param>
-    /// <param name="obj"></param>
     public void ReturnToPool(string tag,GameObject obj)
     {
         if(!poolDictionary.ContainsKey(tag))
@@ -146,5 +146,27 @@ public class ObjectPool : MonoBehaviour
         obj.SetActive(false);
         obj.transform.SetParent(this.transform);
         poolDictionary[tag].Enqueue(obj);
+        if(activeByTag.TryGetValue(tag,out var set))
+            set.Remove(obj);
+    }
+    public void ReturnAll()
+    {
+        var allTags = new List<string>(activeByTag.Keys);
+        Debug.Log("返还全部对象池物品");
+        foreach (var tag in allTags)
+        {
+            var activeObj = new List<GameObject>();
+            foreach (var obj in activeByTag[tag])
+            {
+                if(obj != null)
+                    activeObj.Add(obj);
+            }
+            foreach(var obj in activeObj)
+            {
+                ReturnToPool(tag, obj);
+            }
+
+        }
+        activeByTag.Clear();
     }
 }

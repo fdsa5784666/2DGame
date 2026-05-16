@@ -94,6 +94,14 @@ public partial class GameData : MonoBehaviour
         globalAttackSpeedBonus = 0f;
         maxHealthBonus = 0f;
     }
+    public void ResetSpeed()
+    {
+        playerSpeed = basePlayerSpeed;
+    }
+    public void PlayerSpeedAdd(float value)
+    {
+        playerSpeed += value;
+    }
     // ========== 创建子弹信息快照 ==========
     public BulletInfo CreateBulletInfo(float skillMultiplier = 1f)
     {
@@ -157,5 +165,11 @@ public partial class GameData : MonoBehaviour
     public void AddMaxHealthBonus(float v) => maxHealthBonus += v;
     public void AddAttackFlat(float v) => attackFlatBonus += v;
 
-
+    public void CancelCharacterBonus()
+    {
+        ResetSynergyBonuses();
+        playerCurrentHealth = playerMaxHealth;
+        ResetSpeed();
+        Debug.Log("加成已清空");
+    }
 }

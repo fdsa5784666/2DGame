@@ -182,7 +182,7 @@ public class UpgradeData : ScriptableObject
         gameData.expMultiplier += expMultiplierBonus;
         gameData.goldMultiplier += goldMultiplierBonus;
         gameData.AddMaxHealthBonus(maxHealthBonus);
-        gameData.playerSpeed += moveSpeedBonus;
+        gameData.PlayerSpeedAdd(moveSpeedBonus);
         gameData.AddCriticalRate(critRateBonus);
         gameData.AddCriticalDamage(critDamageBonus);
         gameData.pickupRange += pickupRangeBonus;

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b39a3997f460a2f4bb81fb240b0ab1ce, type: 3}
+  m_Name: "\u6E38\u4FA0_\u89D2\u8272"
+  m_EditorClassIdentifier: 
+  characterName: "\u6E38\u4FA0"
+  description: "\u884C\u8D70\u5728\u8FD9\u7247\u8352\u91CE\u4E2D\u7684\u6E38\u4FA0\uFF0C\u62E5\u6709\u4E00\u628A\u7956\u4F20\u7684\u5F13\uFF0C\u7834\u70C2\u4E0D\u582A\u3002\u6E38\u4FA0\u5728\u653B\u51FB\u8FDC\u5904\u76EE\u6807\u65F6\u6BD4\u4E00\u822C\u4EBA\u7784\u5F97\u66F4\u51C6\uFF0C\u540C\u65F6\u4EBA\u5458\u8F6C\u79FB\u901F\u5EA6\u4E5F\u66F4\u5FEB\u3002"
+  icon: {fileID: 0}
+  characterPrefab: {fileID: 8966551983786043591, guid: 9330dc33894fd1747ab33f775de03b34, type: 3}
+  startingWeapon: {fileID: 11400000, guid: 2dd50949f3c8cfc4bbc9c80363c683df, type: 2}
+  maxHealthBonus: 1
+  moveSpeedBonus: 1.5
+  damageBonus: 0
+  attackSpeedBonus: 0
+  critRateBonus: 0.05
+  additionalStartingWeapons: []
+  exclusiveUpgrades:
+  - optionName: 
+    description: 
+    icon: {fileID: 0}
+    weight: 100
+    minPlayerLevel: 0
+    maxLevel: 10
+    currentLevel: 0
+    type: 0
+    value: 0
+  - optionName: 
+    description: 
+    icon: {fileID: 0}
+    weight: 100
+    minPlayerLevel: 0
+    maxLevel: 10
+    currentLevel: 0
+    type: 0
+    value: 0
+  unlockedByDefault: 1
+  unlockCost: 0
+  unlockCondition: 

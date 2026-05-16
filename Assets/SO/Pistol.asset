@@ -25,19 +25,28 @@ MonoBehaviour:
       time: 1
       value: 1
       inSlope: 0
-      outSlope: 1
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 3
-      value: 3
-      inSlope: 1
-      outSlope: 0
+      time: 1.9941607
+      value: 1.5139713
+      inSlope: 1.154628
+      outSlope: 1.154628
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
+      outWeight: 0.27285367
+    - serializedVersion: 3
+      time: 3.0000024
+      value: 4.0092173
+      inSlope: 3.0664332
+      outSlope: 3.0664332
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.11611797
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -67,5 +76,5 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   baseDamage: 10
-  baseAttackSpeed: 2
+  baseAttackSpeed: 1
   baseAttackRange: 3

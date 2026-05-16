@@ -25,10 +25,24 @@ public partial class GameData : MonoBehaviour
     public int playerLevel = 1;
     public int expToNextLevel = 10;
     public const float LevelUpValueMultValue = 1.5f;
-    public const int playerFirstUpgradeValue = 10; 
-    public float playerSpeed = 4f;
+    public const int playerFirstUpgradeValue = 10;
+    private float basePlayerSpeed = 4f;
+    private float playerSpeed = 4f;
     public float pickupRange = 3f;
     public int attackRange = 10;
+
+    public float PlayerSpeed => playerSpeed;
+    [SerializeField]
+    private CharacterData playerChosenCharacter = null;
+    public CharacterData PlayerChosenCharacter => playerChosenCharacter;
+    public void SetCharacter(CharacterData c)
+    {
+        playerChosenCharacter = c;
+        if (c != null)
+            OnCharacterChosen?.Invoke(true);
+        else
+            OnCharacterChosen?.Invoke(false);
+    }
 
     [Header("=== 资源 ===")]
     [SerializeField] private int gold = 0;
@@ -68,6 +82,8 @@ public partial class GameData : MonoBehaviour
     public UIManager uiManager;
     public GameObject HealthPotionPrefab;
 
+    public WeaponData pistolData;
+
     public GameObject PauseSignal;
     #region *** 属性 ***
     public int Gold => gold;
@@ -85,15 +101,18 @@ public partial class GameData : MonoBehaviour
     public EGameState CurrentState => currentState;
     public float GameTimer => gameTimer;
     #endregion
+    public List<GameObject> activeNonpooledObj;
 
     // 事件
     public event Action<float> OnTimerUpdated;
     public event Action<int> OnGoldChanged;
-    public event Action<int> OnKillsChanged;
+    //public event Action<int> OnKillsChanged;
     public event Action<float, float> OnHealthChanged;
     public event Action<int, int, int> OnExpChanged;
     public event Action<EGameState> OnStateChanged;
     public event Action<int> OnLevelUp;
+    public event Action<bool> OnCharacterChosen;
+
 
     private void Awake()
     {
@@ -129,13 +148,13 @@ public partial class GameData : MonoBehaviour
         }
 
     }
-    void InitializeGame()
+    public void InitializeGame()
     {
-        currentState = EGameState.Playing;
+
         gameTimer = 0f;
         playerLevel = 1;
         playerEXP = 0;
-        expToNextLevel = 10;
+        expToNextLevel = playerFirstUpgradeValue;
         playerCurrentHealth = playerMaxHealth;
         gold = 0;
         totalKills = 0;
@@ -157,10 +176,13 @@ public partial class GameData : MonoBehaviour
         return true;
     }
 
-    public void AddKill()
+    public void AddKill(int kill = 0)
     {
-        totalKills++;
-        OnKillsChanged?.Invoke(totalKills);
+        if (kill == 0)
+            totalKills++;
+        else
+            totalKills += kill;
+        //OnKillsChanged?.Invoke(totalKills);
     }
     #endregion
 
@@ -190,10 +212,16 @@ public partial class GameData : MonoBehaviour
         OnStateChanged?.Invoke(currentState);
 
         // 通知元进度管理器
-        MetaProgressionManager.Instance?.OnGameFinished(victory, gold, totalKills);
+        //MetaProgressionManager.Instance?.OnGameFinished(victory, gold, totalKills);
 
-        if (!victory && playerCurrentHealth > 0) return;
-        
+        //中途退出 按跳过结算返回标题界面处理
+        if (!victory && playerCurrentHealth > 0)
+        {
+            Reward();
+            SceneManager.Instance.SetSceneType(ESceneType.Title);
+            return;
+        }
+
         //推测也要有胜利失败两种情况
         uiManager?.ShowGameOver(victory);
     }
@@ -203,12 +231,31 @@ public partial class GameData : MonoBehaviour
         GameOver(true);
     }
 
-    public void ResetLevel()
+    public void Reward()
     {
-        playerCurrentHealth = playerMaxHealth;
-        playerLevel = 0;
-        playerEXP = 0;
-        expToNextLevel = playerFirstUpgradeValue;
+        SaveManager.Instance.AddRewardOnGameEnd(Gold, TotalKills);
+
+        Debug.Log($"gold:{Gold} kill:{TotalKills}");
+
+    }
+    public IEnumerator GameWaitSecondsResume(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+        Resume();
+
     }
 }
 
+public enum EGameState
+{
+    Playing,
+    Paused,
+    GameOver,
+    Victory
+}
+
+public enum GameMode
+{
+    Standard,
+    Endless
+}
